@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-from birdEyeView import birdEyeView
 
 
-def sobel_thresh(frame, orient='x', thresh=(0,255)):
+
+def sobel_thresh(frame, orient='x', thresh=(100,255)):
     gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     
     if orient == 'x':
@@ -16,7 +16,7 @@ def sobel_thresh(frame, orient='x', thresh=(0,255)):
     abs_sobel = np.absolute(sobel)
     scaled_sobel = np.uint8(255*abs_sobel/np.max(abs_sobel))
     sxbinary = np.zeros_like(scaled_sobel)
-    sxbinary[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 1
+    sxbinary[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 255
     return sxbinary
 
 
@@ -57,7 +57,7 @@ def dir_thresh(img, sobel_kernel=3, thresh=(0, np.pi/2)):
 
 def X_threshholding(frame):
     blured = cv2.GaussianBlur(frame, (5,5), 0)
-    gradX = sobel_thresh(blured, 'x', (50,255))
+    gradX = sobel_thresh(blured, 'x', (0,255))
     return gradX
 def Y_threshholding(frame):
     blured = cv2.GaussianBlur(frame, (5,5), 0)
@@ -74,17 +74,6 @@ def GradDirThresh(frame):
     graddirthresh = dir_thresh(blured, 3, (a-b, a+b))
     return graddirthresh
 
-
-def CombinedSobelThresh(frame):
-    blurred = cv2.GaussianBlur(frame, (5,5), 0)
-    grad_x_thresh = sobel_thresh(blurred, 'x', (20, 255))
-    grad_y_thresh = sobel_thresh(blurred, 'y', (40, 150))
-    grad_mag_thresh = mag_thresh(blurred, 3, (20, 255))
-    grad_dir_thresh = dir_thresh(blurred, 3, (0.85, 1.05))
-    combined = np.zeros_like(grad_x_thresh)
-    combination = ((grad_mag_thresh == 1) & (grad_dir_thresh == 1) | (grad_x_thresh ==1 ) | (grad_y_thresh == 1))
-    combined[combination]=1
-    return combined
 
 
 ##color thresh holding
@@ -137,11 +126,22 @@ def s_threshhold(frame, thresh):
 def combined(frame):
     blured = cv2.GaussianBlur(frame, (5,5),0)
 
+
+
+
+    grad_x_thresh = sobel_thresh(blured, 'x', (100, 255))
+    grad_y_thresh = sobel_thresh(blured, 'y', (100, 250))
+    grad_mag_thresh = mag_thresh(blured, 3, (100, 250))
+    grad_dir_thresh = dir_thresh(blured, 3, (0.85, 1.05))
+
+
     r_tresh = r_threshhold(blured, (200, 255))
     b_tresh = b_threshhold(blured, (200, 255))
     s_tresh = s_threshhold(blured, (200, 255))
     l_tresh = l_threshhold(blured, (200,255))
     combination = ((s_tresh == 1) | (l_tresh == 1) | ((r_tresh == 1) & (b_tresh ==1 )))
+
+
     color_treshold = (combination)
     combined = np.zeros_like(s_tresh)
     combined[color_treshold] = 1

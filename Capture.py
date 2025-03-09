@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 from numpy import pi
-from Threshholding import  s_threshhold, HLS_colorspace, Y_threshholding, combined, mag_thresh, GradDirThresh, CombinedSobelThresh, HLS_colorspace
-from onlywhite import white_tresh
+from Threshholding import  sobel_thresh, s_threshhold, HLS_colorspace, Y_threshholding, combined, mag_thresh, GradDirThresh, HLS_colorspace
+from onlywhite import white_tresh 
 from birdEyeView import birdEyeView
 image = cv2.VideoCapture("test/videos/example.mp4")
 fps = image.get(cv2.CAP_PROP_FPS)
@@ -25,9 +25,9 @@ while image.isOpened():
                     cv2.imshow('combined', onlychannel * 255)
                     '''
                     white = white_tresh(frame)
-                    cv2.imshow('white', white * 255)
+                    cv2.imshow('white', white)
                     biw = birdEyeView(frame)
-                    cv2.imshow('biw', biw * 255)
+                    cv2.imshow('biw', biw)
 
         key = cv2.waitKey(int(frame_delay * 100)) & 0xFF
         if key == ord('q'):
